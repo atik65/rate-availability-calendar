@@ -37,7 +37,9 @@ import dayjs from "dayjs";
 import { countDaysByMonth } from "@/utils";
 import RoomRateAvailabilityCalendar from "./(components)/RoomCalendar";
 import Navbar from "@/components/Navbar";
-import useRoomRateAvailabilityCalendar from "./(hooks)/useRoomRateAvailabilityCalendar";
+import useRoomRateAvailabilityCalendar, {
+  IResponse,
+} from "./(hooks)/useRoomRateAvailabilityCalendar";
 import { useInView } from "react-intersection-observer";
 
 // Define the form type for the date range picker
@@ -178,7 +180,10 @@ export default function Page() {
 
   useEffect(() => {
     if (inView) {
-      if (room_calendar?.data) {
+      if (
+        room_calendar?.data?.data?.nextCursor &&
+        room_calendar?.data?.data?.room_categories?.length > 0
+      ) {
         setCursor(room_calendar.data?.data?.nextCursor || 0);
       }
     }
@@ -246,6 +251,28 @@ export default function Page() {
     );
   },
   areEqual);
+
+  const [roomData, setRoomData] = useState<IResponse>({
+    room_categories: [],
+    nextCursor: 0,
+  });
+
+  useEffect(() => {
+    if (room_calendar?.data) {
+      const newMergedData = {
+        room_categories: [
+          ...roomData?.room_categories,
+          ...room_calendar?.data?.data?.room_categories,
+        ],
+        nextCursor: room_calendar?.data?.data?.nextCursor,
+      };
+
+      setRoomData(newMergedData);
+    }
+  }, [room_calendar?.data]);
+
+  console.log("roomData = ", roomData);
+  console.log("room data length = ", roomData.room_categories.length);
 
   return (
     <Container sx={{ backgroundColor: "#EEF2F6" }}>
@@ -377,7 +404,7 @@ export default function Page() {
             </Grid>
           </Grid>
 
-          {room_calendar.isSuccess
+          {/* {room_calendar.isSuccess
             ? room_calendar.data.data.room_categories.map(
                 (room_category, key) => (
                   <RoomRateAvailabilityCalendar
@@ -392,7 +419,19 @@ export default function Page() {
                   />
                 )
               )
-            : null}
+            : null} */}
+
+          {roomData?.room_categories?.map((room_category, key) => (
+            <RoomRateAvailabilityCalendar
+              key={key}
+              index={key}
+              InventoryRefs={InventoryRefs}
+              isLastElement={key === roomData?.room_categories.length - 1}
+              room_category={room_category}
+              handleCalenderScroll={handleCalenderScroll}
+            />
+          ))}
+
           {room_calendar.isLoading && (
             <Box
               sx={{

@@ -50,7 +50,7 @@ interface IParams {
   cursor: number;
 }
 
-interface IResponse {
+export interface IResponse {
   room_categories: Array<IRoomCategoryCalender>;
   nextCursor?: number; // available if you pass a cursor as query param
 }
