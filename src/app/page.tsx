@@ -74,9 +74,6 @@ export default function Page() {
     threshold: 0,
   });
 
-  console.log("inView = ", inView);
-  console.log("entry = ", entry);
-
   // Handle horizontal scroll for dates
   const handleDatesScroll = useCallback(({ scrollLeft }: GridOnScrollProps) => {
     InventoryRefs.current.forEach((ref) => {
@@ -271,8 +268,12 @@ export default function Page() {
     }
   }, [room_calendar?.data]);
 
-  console.log("roomData = ", roomData);
-  console.log("room data length = ", roomData.room_categories.length);
+  const handleMinimizeRoomData = () => {
+    const minimizedData = {
+      room_categories: roomData?.room_categories?.pop(),
+      nextCursor: roomData.nextCursor,
+    };
+  };
 
   return (
     <Container sx={{ backgroundColor: "#EEF2F6" }}>
@@ -421,7 +422,7 @@ export default function Page() {
               )
             : null} */}
 
-          {roomData?.room_categories?.map((room_category, key) => (
+          {roomData?.room_categories?.slice(0, 2)?.map((room_category, key) => (
             <RoomRateAvailabilityCalendar
               key={key}
               index={key}
@@ -456,10 +457,10 @@ export default function Page() {
               backgroundColor: "red",
               // marginTop: 2,
               // padding: 2,
-              borderRadius: 2,
+              // borderRadius: 2,
             }}
           >
-            {/* Bottom part */}
+            {/* Bottom part | where next cursor data will be fetched if scroll reaches here */}
           </Box>
         </Card>
       </Box>
