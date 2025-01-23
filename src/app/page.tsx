@@ -39,6 +39,7 @@ import RoomRateAvailabilityCalendar from "./(components)/RoomCalendar";
 import Navbar from "@/components/Navbar";
 import useRoomRateAvailabilityCalendar, {
   IResponse,
+  IRoomCategory,
 } from "./(hooks)/useRoomRateAvailabilityCalendar";
 import { useInView } from "react-intersection-observer";
 
@@ -190,7 +191,7 @@ export default function Page() {
     }
   }, [inView]);
 
-  console.log("cursor = ", cursor);
+  // console.log("cursor = ", cursor);
 
   // Component to render each month row in the calendar
   const MonthRow: React.FC<ListChildComponentProps> = memo(function MonthRowFC({
@@ -258,6 +259,25 @@ export default function Page() {
     nextCursor: 0,
   });
 
+  console.log("roomData = ", roomData);
+
+  // const [
+  //   room_data_index_in_center_of_view,
+  //   set_room_data_index_in_center_of_view,
+  // ] = useState(0);
+
+  const [roomDataIndexInCenterOfView, setRoomDataIndexInCenterOfView] =
+    useState(0);
+
+  const [renderableRoomData, setRenderableRoomData] = useState<IResponse[]>([]);
+
+  // const [roomDataInView, setRoomDataInView] = useState<IRoomCategory>({
+  //   id: "",
+  //   name: "",
+  //   occupancy: 0,
+  // });
+
+  // store fetched data from next cursor
   useEffect(() => {
     if (room_calendar?.data) {
       const newMergedData = {
@@ -272,12 +292,43 @@ export default function Page() {
     }
   }, [room_calendar?.data]);
 
+  // set renderable room data
+  useEffect(() => {
+    if (!roomData?.room_categories?.length) {
+      return;
+    }
+
+    let newRenderableRoomData = [
+      roomData?.room_categories[roomDataIndexInCenterOfView],
+    ];
+
+    if (roomData?.room_categories[roomDataIndexInCenterOfView - 1]) {
+      newRenderableRoomData = [
+        roomData?.room_categories[roomDataIndexInCenterOfView - 1],
+        ...newRenderableRoomData,
+      ];
+    }
+
+    if (roomData?.room_categories[roomDataIndexInCenterOfView + 1]) {
+      newRenderableRoomData = [
+        ...newRenderableRoomData,
+        roomData?.room_categories[roomDataIndexInCenterOfView + 1],
+      ];
+    }
+
+    setRenderableRoomData(newRenderableRoomData);
+  }, [roomDataIndexInCenterOfView, roomData?.room_categories]);
+
   // const handleMinimizeRoomData = () => {
   //   const minimizedData = {
   //     room_categories: roomData?.room_categories?.pop(),
   //     nextCursor: roomData.nextCursor,
   //   };
   // };
+
+  // console.log("roomDataIndexInCenterOfView = ", roomDataIndexInCenterOfView);
+
+  console.log("renderableRoomData = ", renderableRoomData);
 
   return (
     <Container sx={{ backgroundColor: "#EEF2F6" }}>
@@ -426,7 +477,8 @@ export default function Page() {
               )
             : null} */}
 
-          {roomData?.room_categories?.slice(0, 2)?.map((room_category, key) => (
+          {roomData?.room_categories?.map((room_category, key) => (
+            // {renderableRoomData?.map((room_category, key) => (
             <RoomRateAvailabilityCalendar
               key={key}
               index={key}
@@ -434,6 +486,8 @@ export default function Page() {
               isLastElement={key === roomData?.room_categories.length - 1}
               room_category={room_category}
               handleCalenderScroll={handleCalenderScroll}
+              roomDataIndexInCenterOfView={roomDataIndexInCenterOfView}
+              handleSetCenterTableOfView={setRoomDataIndexInCenterOfView}
             />
           ))}
 

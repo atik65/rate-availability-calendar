@@ -9,7 +9,7 @@ import {
   GridChildComponentProps,
   GridOnScrollProps,
 } from "react-window";
-import { memo, RefObject, useMemo, useRef } from "react";
+import { memo, RefObject, useEffect, useMemo, useRef } from "react";
 import { styled } from "@mui/material/styles";
 import RoomRateCell from "./RateCell";
 import RoomRateRestrictionsCell from "./RestrictionsCell";
@@ -19,11 +19,14 @@ import {
   IRoomInventory,
 } from "../(hooks)/useRoomRateAvailabilityCalendar";
 import { Person } from "@mui/icons-material";
+import { useInView } from "react-intersection-observer";
 
 // Define the props for the RoomRateAvailabilityCalendar component
 interface IProps {
   InventoryRefs: RefObject<Array<RefObject<VariableSizeGrid | null>>>;
   handleCalenderScroll: ({ scrollLeft }: GridOnScrollProps) => void;
+  handleSetCenterTableOfView: (index: number) => void;
+  roomDataIndexInCenterOfView: number;
   index: number;
   isLastElement: boolean;
   room_category: IRoomCategoryCalender;
@@ -44,6 +47,31 @@ interface IGridData {
 export default function RoomRateAvailabilityCalendar(props: IProps) {
   const theme = useTheme(); // Get the theme for styling
   const InventoryRef = useRef<VariableSizeGrid | null>(null);
+
+  const {
+    ref,
+    inView,
+    // entry
+  } = useInView({
+    /* Optional options */
+    threshold: 0,
+  });
+
+  // console.log("table item info =  ", props);
+  // console.log("table item in view or not = ", inView);
+
+  useEffect(() => {
+    if (inView) {
+      props.handleSetCenterTableOfView(props.index);
+    } else {
+      if (
+        props.roomDataIndexInCenterOfView === props.index &&
+        props.index - 1 >= 0
+      ) {
+        props.handleSetCenterTableOfView(props.index - 1);
+      }
+    }
+  }, [inView]);
 
   // Store the ref in the InventoryRefs array
   props.InventoryRefs.current[props.index] = InventoryRef;
@@ -226,7 +254,7 @@ export default function RoomRateAvailabilityCalendar(props: IProps) {
   // console.log("props = ", props);
 
   return (
-    <>
+    <Box ref={ref}>
       <Grid container sx={{ py: 4, px: 4 }}>
         <Grid size={10}>
           <Typography
@@ -417,6 +445,6 @@ export default function RoomRateAvailabilityCalendar(props: IProps) {
           </AutoSizer>
         </Grid>
       </Grid>
-    </>
+    </Box>
   );
 }
