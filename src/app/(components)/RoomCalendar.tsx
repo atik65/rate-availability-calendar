@@ -223,6 +223,8 @@ export default function RoomRateAvailabilityCalendar(props: IProps) {
         }
   );
 
+  console.log("props = ", props);
+
   return (
     <>
       <Grid container sx={{ py: 4, px: 4 }}>
@@ -248,6 +250,7 @@ export default function RoomRateAvailabilityCalendar(props: IProps) {
         }}
       >
         <Grid
+          key={props.room_category.id}
           sx={{
             pl: 4,
             fontSize: "12px",

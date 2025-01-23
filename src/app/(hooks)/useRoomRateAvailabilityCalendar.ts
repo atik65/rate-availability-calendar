@@ -47,6 +47,7 @@ interface IParams {
   property_id: number;
   start_date: string;
   end_date: string;
+  cursor: number;
 }
 
 interface IResponse {
@@ -64,7 +65,7 @@ export default function useRoomRateAvailabilityCalendar(params: IParams) {
   url.search = new URLSearchParams({
     start_date: params.start_date,
     end_date: params.end_date,
-    // cursor: "0", // for infinite scroll
+    cursor: params.cursor.toString(), // for infinite scroll
   }).toString();
 
   // Use React Query's useQuery hook to fetch data

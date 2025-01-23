@@ -38,6 +38,7 @@ import { countDaysByMonth } from "@/utils";
 import RoomRateAvailabilityCalendar from "./(components)/RoomCalendar";
 import Navbar from "@/components/Navbar";
 import useRoomRateAvailabilityCalendar from "./(hooks)/useRoomRateAvailabilityCalendar";
+import { useInView } from "react-intersection-observer";
 
 // Define the form type for the date range picker
 export type CalendarForm = {
@@ -64,6 +65,15 @@ export default function Page() {
   const calenderDatesRef = useRef<FixedSizeGrid | null>(null);
   const mainGridContainerRef = useRef<HTMLDivElement | null>(null);
   const InventoryRefs = useRef<Array<RefObject<VariableSizeGrid>>>([]);
+  const [cursor, setCursor] = useState(0);
+
+  const { ref, inView, entry } = useInView({
+    /* Optional options */
+    threshold: 0,
+  });
+
+  console.log("inView = ", inView);
+  console.log("entry = ", entry);
 
   // Handle horizontal scroll for dates
   const handleDatesScroll = useCallback(({ scrollLeft }: GridOnScrollProps) => {
@@ -163,7 +173,18 @@ export default function Page() {
       ? watchedDateRange[1]
       : watchedDateRange[0]!.add(2, "month")
     ).format("YYYY-MM-DD"),
+    cursor: cursor,
   });
+
+  useEffect(() => {
+    if (inView) {
+      if (room_calendar?.data) {
+        setCursor(room_calendar.data?.data?.nextCursor || 0);
+      }
+    }
+  }, [inView]);
+
+  console.log("cursor = ", cursor);
 
   // Component to render each month row in the calendar
   const MonthRow: React.FC<ListChildComponentProps> = memo(function MonthRowFC({
@@ -384,6 +405,23 @@ export default function Page() {
               <CircularProgress />
             </Box>
           )}
+
+          <Box
+            ref={ref}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "auto",
+              width: "100%",
+              backgroundColor: "red",
+              // marginTop: 2,
+              // padding: 2,
+              borderRadius: 2,
+            }}
+          >
+            {/* Bottom part */}
+          </Box>
         </Card>
       </Box>
       <Box
