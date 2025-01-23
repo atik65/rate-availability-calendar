@@ -69,7 +69,11 @@ export default function Page() {
   const InventoryRefs = useRef<Array<RefObject<VariableSizeGrid>>>([]);
   const [cursor, setCursor] = useState(0);
 
-  const { ref, inView, entry } = useInView({
+  const {
+    ref,
+    inView,
+    // entry
+  } = useInView({
     /* Optional options */
     threshold: 0,
   });
@@ -268,12 +272,12 @@ export default function Page() {
     }
   }, [room_calendar?.data]);
 
-  const handleMinimizeRoomData = () => {
-    const minimizedData = {
-      room_categories: roomData?.room_categories?.pop(),
-      nextCursor: roomData.nextCursor,
-    };
-  };
+  // const handleMinimizeRoomData = () => {
+  //   const minimizedData = {
+  //     room_categories: roomData?.room_categories?.pop(),
+  //     nextCursor: roomData.nextCursor,
+  //   };
+  // };
 
   return (
     <Container sx={{ backgroundColor: "#EEF2F6" }}>
