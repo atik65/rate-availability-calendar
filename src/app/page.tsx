@@ -39,7 +39,7 @@ import RoomRateAvailabilityCalendar from "./(components)/RoomCalendar";
 import Navbar from "@/components/Navbar";
 import useRoomRateAvailabilityCalendar, {
   IResponse,
-  IRoomCategory,
+  IRoomCategoryCalender,
 } from "./(hooks)/useRoomRateAvailabilityCalendar";
 import { useInView } from "react-intersection-observer";
 
@@ -259,7 +259,7 @@ export default function Page() {
     nextCursor: 0,
   });
 
-  console.log("roomData = ", roomData);
+  // console.log("roomData = ", roomData);
 
   // const [
   //   room_data_index_in_center_of_view,
@@ -269,7 +269,9 @@ export default function Page() {
   const [roomDataIndexInCenterOfView, setRoomDataIndexInCenterOfView] =
     useState(0);
 
-  const [renderableRoomData, setRenderableRoomData] = useState<IResponse[]>([]);
+  const [renderableRoomData, setRenderableRoomData] = useState<
+    IRoomCategoryCalender[]
+  >([]);
 
   // const [roomDataInView, setRoomDataInView] = useState<IRoomCategory>({
   //   id: "",
@@ -317,6 +319,11 @@ export default function Page() {
     }
 
     setRenderableRoomData(newRenderableRoomData);
+
+    // console.log(
+    //   'room data changed and use effect fired "roomDataIndexInCenterOfView = ',
+    //   roomDataIndexInCenterOfView
+    // );
   }, [roomDataIndexInCenterOfView, roomData?.room_categories]);
 
   // const handleMinimizeRoomData = () => {
@@ -328,7 +335,7 @@ export default function Page() {
 
   // console.log("roomDataIndexInCenterOfView = ", roomDataIndexInCenterOfView);
 
-  console.log("renderableRoomData = ", renderableRoomData);
+  console.log("renderableRoomData for optimization = ", renderableRoomData);
 
   return (
     <Container sx={{ backgroundColor: "#EEF2F6" }}>
